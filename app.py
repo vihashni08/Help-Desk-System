@@ -403,5 +403,6 @@ def view_tickets_by_department(department):
     filtered_tickets = ticket_tree.get_tickets_by_department(department)
     return render_template('department_tickets.html', department=department, tickets=filtered_tickets)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
+
