@@ -1,28 +1,30 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from extensions import db
-from datetime import datetime
-from flask import Flask
 from flask_mail import Mail, Message
-from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 from models import User, Ticket
 from dotenv import load_dotenv
+from urllib.parse import urlparse
 import os
 import random
 import re
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# -------------------- App Setup --------------------
 
-# Load environment variables
 load_dotenv()
 
-# Secret key
+app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# ✅ Use the DATABASE_URL from .env (or Render)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+# ✅ Use DATABASE_URL from environment (Render, etc.)
+database_url = os.getenv('DATABASE_URL')
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
 
-# Email config
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+
+# ✅ Email configuration
 app.config.update(
     MAIL_SERVER='smtp.gmail.com',
     MAIL_PORT=587,
@@ -112,10 +114,8 @@ def submit_page():
 @app.route('/submit_ticket', methods=['POST'])
 def submit_ticket():
     try:
-        print("🚀 Form data:", dict(request.form))
-        formatted_date = request.form['date']  # Expected in dd/mm/yyyy
+        formatted_date = request.form['date']
         ticket_id = generate_ticket_id()
-
         while Ticket.query.get(ticket_id):
             ticket_id = generate_ticket_id()
 
@@ -141,15 +141,12 @@ def submit_ticket():
         db.session.add(ticket)
         db.session.flush()
         db.session.commit()
-        print("✅ Ticket submitted with ID:", ticket.id)
 
         send_email(ticket.email, ticket.id, ticket)
-
         return redirect(url_for('ticket_details', ticket_id=ticket.id))
 
     except Exception as e:
         db.session.rollback()
-        print(f"❌ Error submitting ticket: {e}")
         flash(f"❌ Failed to submit ticket: {e}")
         return redirect(url_for('submit_page'))
 
@@ -183,7 +180,6 @@ def admin_edit_ticket(ticket_id):
             send_closure_email(ticket.email, ticket.id, ticket)
     return redirect(url_for('admin_dashboard'))
 
-# This one is for department_tickets.html
 @app.route('/mark_priority/<ticket_id>/<department>', methods=['POST'])
 def mark_priority_department(ticket_id, department):
     ticket = Ticket.query.get(ticket_id)
@@ -192,7 +188,6 @@ def mark_priority_department(ticket_id, department):
         db.session.commit()
     return redirect(url_for('view_tickets_by_department', department=department))
 
-# This one is for admin_dashboard.html
 @app.route('/mark_priority/<ticket_id>', methods=['POST'])
 def mark_priority(ticket_id):
     ticket = Ticket.query.get(ticket_id)
@@ -200,7 +195,6 @@ def mark_priority(ticket_id):
         ticket.priority = not ticket.priority
         db.session.commit()
     return redirect(url_for('admin_dashboard'))
-
 
 @app.route('/view_opened')
 def view_opened():
