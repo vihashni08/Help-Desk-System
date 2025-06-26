@@ -1,23 +1,28 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from extensions import db
 from datetime import datetime
+from flask import Flask
 from flask_mail import Mail, Message
 from flask_sqlalchemy import SQLAlchemy
 from models import User, Ticket
-from urllib.parse import quote
-import random
-import re
 from dotenv import load_dotenv
 import os
+import random
+import re
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Load environment variables
 load_dotenv()
 
+# Secret key
 app.secret_key = os.getenv('SECRET_KEY')
-password = quote(os.getenv('DB_PASSWORD'))
-app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://postgres:{password}@localhost/helpdesk_db'
 
+# ✅ Use the DATABASE_URL from .env (or Render)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+
+# Email config
 app.config.update(
     MAIL_SERVER='smtp.gmail.com',
     MAIL_PORT=587,
@@ -26,8 +31,10 @@ app.config.update(
     MAIL_PASSWORD=os.getenv('MAIL_PASSWORD'),
     MAIL_DEFAULT_SENDER=os.getenv('MAIL_USERNAME')
 )
+
 mail = Mail(app)
 db.init_app(app)
+
 # -------------------- Utility --------------------
 
 def generate_ticket_id():
