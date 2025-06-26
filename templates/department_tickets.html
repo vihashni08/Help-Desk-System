@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tickets by Department</title>
     <style>
-        /* Add your custom styles here */
         body {
             font-family: Arial, sans-serif;
             line-height: 1.6;
@@ -16,18 +15,40 @@
             background-repeat: no-repeat;
             background-size: cover;
         }
-        h1{text-align: center;}
+        h1 {
+            text-align: center;
+            color: #333;
+        }
         .container {
             max-width: 1000px;
             margin: auto;
             overflow: hidden;
             padding: 0 20px;
         }
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .btn {
+            padding: 6px 12px;
+            background-color: #0056b3;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin: 0 6px;
+        }
+        .btn:hover {
+            background-color: #003f87;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
-            background-color: #f2f2f2;
+            background-color: #ffffffee;
         }
         th, td {
             border: 1px solid #0e0d0d;
@@ -37,17 +58,23 @@
         th {
             background-color: #f2f2f2;
         }
-        .back-link {
-            margin-top: 10px;
-            display: inline-block;
-            text-decoration: none;
-            color: blue;
+        .priority {
+            color: gold;
+            font-weight: bold;
+            text-align: center;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Tickets by Department: {{ department }}</h1>
+
+        <div class="controls">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn">Admin Dashboard</a>
+            <a href="{{ url_for('departments') }}" class="btn">Back to Departments</a>
+            <a href="{{ url_for('home') }}" class="btn">Sign Out</a>
+        </div>
+
         <div id="tickets">
             {% if tickets and tickets|length > 0 %}
                 <table>
@@ -64,7 +91,6 @@
                             <th>Time</th>
                             <th>Priority</th>
                             <th>Actions</th>
-
                         </tr>
                     </thead>
                     <tbody>
@@ -82,19 +108,20 @@
                                     <td>{{ ticket.time }}</td>
                                     <td class="priority">{{ '⭐' if ticket.priority }}</td>
                                     <td>
-                                        <!-- Update form for ticket status -->
                                         <form action="{{ url_for('admin_edit_ticket', ticket_id=ticket.id) }}" method="post" style="display: inline;">
-                                            <select name="status" class="change-status-select">
+                                            <select name="status">
                                                 <option value="Opened">Opened</option>
                                                 <option value="Closed">Closed</option>
                                             </select>
-                                            <button type="submit" class="change-status-btn">Change Status</button>
+                                            <button type="submit">Change Status</button>
                                         </form>
-                                        <form action="{{ url_for('mark_priority', ticket_id=ticket.id) }}" method="post" style="display: inline;">
-                                            <button type="submit" class="mark-priority-btn">{% if ticket.priority %} Remove Priority {% else %} Mark Priority {% endif %}</button>
+                                        <form action="{{ url_for('mark_priority_department', ticket_id=ticket.id, department=department) }}" method="post" style="display: inline;">
+                                            <button type="submit">
+                                                {{ 'Unmark Priority' if ticket.priority else 'Mark Priority' }}
+                                            </button>
                                         </form>
                                     </td>
-                                                        </tr>
+                                </tr>
                             {% endif %}
                         {% endfor %}
                     </tbody>
@@ -103,7 +130,6 @@
                 <p>No tickets found for department: <strong>{{ department }}</strong>.</p>
             {% endif %}
         </div>
-        <a class="back-link" href="{{ url_for('departments') }}">Back to Departments</a>
     </div>
 </body>
 </html>

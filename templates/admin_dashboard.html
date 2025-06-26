@@ -10,47 +10,70 @@
             background-repeat: no-repeat;
             background-size: cover;
         }
+
         h1 {
             text-align: center;
             margin-bottom: 20px;
         }
+
         .controls {
             margin-bottom: 20px;
             text-align: center;
         }
+
         .controls a, .controls form {
             margin: 0 10px;
             display: inline-block;
         }
-        .controls form {
-            margin: 0;
-        }
+
         .controls input {
             padding: 5px;
             font-size: 14px;
         }
+
         .controls button {
             padding: 5px 10px;
             font-size: 14px;
         }
+        .btn {
+            padding: 6px 12px;
+            background-color: #0056b3;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            border: none;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: #003f87;
+        }
+
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
             background-color: #ffffffef;
         }
+
         th, td {
             border: 1px solid #0d0d0d;
             padding: 8px;
             text-align: left;
         }
+
         th {
             background-color: #f2f2f2;
         }
+
         .priority {
             color: gold;
             font-weight: bold;
+            text-align: center;
         }
+
         .btn-mark-priority {
             padding: 5px 10px;
             font-size: 12px;
@@ -58,27 +81,33 @@
             border: none;
             cursor: pointer;
         }
+
         .btn-mark-priority.priority-marked {
-            background-color: #f0ad4e; /* Adjust color for marked tickets */
+            background-color: #f0ad4e;
+        }
+
+        .priority-row {
+            background-color: #fff7d1;
         }
     </style>
 </head>
 <body>
     <h1>Admin Dashboard</h1>
-    <div class="controls">
-        <a href="{{ url_for('view_opened') }}">View Opened Tickets</a>
-        <a href="{{ url_for('view_closed') }}">View Closed Tickets</a>
-        <form action="{{ url_for('search_tickets') }}" method="get">
-            <input type="text" name="query" placeholder="Search">
-            <button type="submit">Search</button>
-        </form>
-        <a href="{{ url_for('sort_tickets', order='latest') }}">Sort by Latest</a>
-        <a href="{{ url_for('sort_tickets', order='earliest') }}">Sort by Earliest</a>
-        <a href="{{ url_for('departments')}}">Departments</a>
-        <a href="{{ url_for('home') }}" class="button">Sign out</a>
 
-    </div>
-    
+    <div class="controls">
+    <a href="{{ url_for('view_opened') }}" class="btn">View Opened Tickets</a>
+    <a href="{{ url_for('view_closed') }}" class="btn">View Closed Tickets</a>
+    <form action="{{ url_for('search_tickets') }}" method="get">
+        <input type="text" name="query" placeholder="Search">
+        <button type="submit" class="btn">Search</button>
+    </form>
+    <a href="{{ url_for('sort_tickets', order='latest') }}" class="btn">Sort by Latest</a>
+    <a href="{{ url_for('sort_tickets', order='earliest') }}" class="btn">Sort by Earliest</a>
+    <a href="{{ url_for('departments') }}" class="btn">Departments</a>
+    <a href="{{ url_for('home') }}" class="btn">Sign out</a>
+</div>
+
+
     <table>
         <tr>
             <th>ID</th>
@@ -95,7 +124,7 @@
             <th>Actions</th>
         </tr>
         {% for ticket in tickets %}
-        <tr>
+        <tr class="{% if ticket.priority %}priority-row{% endif %}">
             <td>{{ ticket.id }}</td>
             <td>{{ ticket.name }}</td>
             <td>{{ ticket.date }}</td>
@@ -108,16 +137,20 @@
             <td>{{ ticket.time }}</td>
             <td class="priority">{{ '⭐' if ticket.priority }}</td>
             <td>
-                <!-- Update form for ticket status -->
+                <!-- Update ticket status -->
                 <form action="{{ url_for('admin_edit_ticket', ticket_id=ticket.id) }}" method="post" style="display: inline;">
                     <select name="status" class="change-status-select">
-                        <option value="Opened">Opened</option>
-                        <option value="Closed">Closed</option>
+                        <option value="Opened" {% if ticket.status == 'Opened' %}selected{% endif %}>Opened</option>
+                        <option value="Closed" {% if ticket.status == 'Closed' %}selected{% endif %}>Closed</option>
                     </select>
-                    <button type="submit" class="change-status-btn">Change Status</button>
+                    <button type="submit" class="change-status-btn">Change</button>
                 </form>
+
+                <!-- Priority toggle -->
                 <form action="{{ url_for('mark_priority', ticket_id=ticket.id) }}" method="post" style="display: inline;">
-                    <button type="submit" class="mark-priority-btn">{% if ticket.priority %} Remove Priority {% else %} Mark Priority {% endif %}</button>
+                    <button type="submit" class="btn-mark-priority {% if ticket.priority %}priority-marked{% endif %}">
+                        {% if ticket.priority %}Remove Priority{% else %}Mark Priority{% endif %}
+                    </button>
                 </form>
             </td>
         </tr>
@@ -125,4 +158,3 @@
     </table>
 </body>
 </html>
-

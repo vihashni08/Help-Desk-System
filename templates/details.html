@@ -111,24 +111,28 @@
 <nav>
     <ul>
         {% if ticket %}
-        <li><a href="{{url_for('dashboard', name=name)}}" class="button">Your dashboard</a></li>
-        <li><a href="{{ url_for('opened_tickets', name=ticket['name']) }}" class="button">Opened Tickets</a></li>
-        <li><a href="{{ url_for('closed_tickets', name=ticket['name']) }}" class="button">Closed Tickets</a></li>
-        <li><a href="{{ url_for('home') }}" class="button">Sign out</a></li>
+        <li><a href="{{ url_for('dashboard', email=ticket.email) }}" class="button">Your Dashboard</a></li>
+        <li><a href="{{ url_for('opened_tickets', email=ticket.email) }}" class="button">Opened Tickets</a></li>
+        <li><a href="{{ url_for('closed_tickets', email=ticket.email) }}" class="button">Closed Tickets</a></li>
+        <li><a href="{{ url_for('home') }}" class="button">Sign Out</a></li>
         {% endif %}
     </ul>
 </nav>
 
+
 <div class="ticket-container">
     {% if ticket %}
-    <h2>Ticket-{{ ticket['id'] }}</h2>
-
+    <h2>Ticket-{{ ticket.id }}</h2>
     <div class="ticket-details">
-        <div><span>Name:</span> {{ ticket['name'] }}</div>
-        <div><span>Date:</span> {{ ticket['date'] }}</div>
-        <div><span>Status:</span> {{ ticket['status'] }}</div>
-        <div><span>Subject:</span> {{ ticket['subject'] }}</div>
-        <div><span>Department:</span> {{ ticket['department'] }}</div>
+        <div><span>Name:</span> {{ ticket.name }}</div>
+        <div><span>Date:</span> {{ ticket.date }}</div>
+        <div><span>Status:</span> {{ ticket.status }}</div>
+        <div><span>Subject:</span> {{ ticket.subject }}</div>
+        <div><span>Department:</span> {{ ticket.department }}</div>
+        <div><span>Room:</span> {{ ticket.room }}</div>
+        <div><span>Location:</span> {{ ticket.location }}</div>
+        <div><span>Mobile:</span> {{ ticket.mobile }}</div>
+        <div><span>Time:</span> {{ ticket.time }}</div>
     </div>
     {% else %}
     <h2>Ticket Not Found</h2>

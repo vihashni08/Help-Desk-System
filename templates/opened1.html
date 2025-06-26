@@ -37,8 +37,8 @@
 </header>
 
 <div class="button-container">
-    <a href="{{url_for('dashboard', name=name)}}" class="button">Your dashboard</a>
-    <a href="{{ url_for('closed_tickets',name=name) }}" class="button">View Closed Tickets</a>
+    <a href="{{ url_for('dashboard', email=email) }}" class="button">Your dashboard</a>
+    <a href="{{ url_for('closed_tickets', email=email) }}" class="button">View Closed Tickets</a>
     <a href="{{ url_for('home') }}" class="button">Sign out</a>
 </div>
 
