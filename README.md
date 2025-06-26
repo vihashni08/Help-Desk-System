@@ -1,13 +1,3 @@
-Here’s your updated `README.md` with the **new updates integrated**—including:
-
-* The system now uses **file-based storage** (`data.txt`, `signup.txt`)
-* `main.py` file is included
-* Future plan to migrate to a database is retained
-* Minor fixes for link formatting and consistency
-
----
-
-```markdown
 # 🛠 Help Desk System
 
 A complete ticket management platform built using **Flask**, designed to simplify issue reporting, tracking, and resolution for organizations. It includes user authentication, priority marking, admin dashboards, department views, email notifications, and persistent storage via files.
