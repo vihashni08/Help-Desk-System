@@ -7,27 +7,27 @@ from models import User, Ticket
 from urllib.parse import quote
 import random
 import re
+from dotenv import load_dotenv
+import os
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
-
-# Database config
-password = quote("Vihashni@2785")
-app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://postgres:{password}@localhost/helpdesk_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db.init_app(app)
+load_dotenv()
 
-# Mail config
+app.secret_key = os.getenv('SECRET_KEY')
+password = quote(os.getenv('DB_PASSWORD'))
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://postgres:{password}@localhost/helpdesk_db'
+
 app.config.update(
     MAIL_SERVER='smtp.gmail.com',
     MAIL_PORT=587,
     MAIL_USE_TLS=True,
-    MAIL_USERNAME='ticketsystem911@gmail.com',
-    MAIL_PASSWORD='eheb xiet ukmz elpc',
-    MAIL_DEFAULT_SENDER='ticketsystem911@gmail.com'
+    MAIL_USERNAME=os.getenv('MAIL_USERNAME'),
+    MAIL_PASSWORD=os.getenv('MAIL_PASSWORD'),
+    MAIL_DEFAULT_SENDER=os.getenv('MAIL_USERNAME')
 )
 mail = Mail(app)
-
+db.init_app(app)
 # -------------------- Utility --------------------
 
 def generate_ticket_id():
